@@ -1,19 +1,43 @@
 import { TrendingUp, Clock, User } from 'lucide-react';
 import { Article } from '@/data/newsData';
+import { validateHexColor, handleImageError } from '@/lib/security';
 
 interface NewsCardProps {
   article: Article;
   variant?: 'default' | 'featured' | 'compact';
+  onArticleClick: (article: Article) => void;
 }
 
-const NewsCard = ({ article, variant = 'default' }: NewsCardProps) => {
+const NewsCard = ({ article, variant = 'default', onArticleClick }: NewsCardProps) => {
+  const safeColor = validateHexColor(article.sourceColor);
+
+  const handleClick = () => {
+    onArticleClick(article);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   if (variant === 'featured') {
     return (
-      <article className="news-card group cursor-pointer">
+      <article 
+        className="news-card group cursor-pointer"
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-label={`Read article: ${article.title}`}
+      >
         <div className="relative h-56 overflow-hidden">
           <img
             src={article.imageUrl}
             alt={article.title}
+            onError={handleImageError}
+            loading="lazy"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
@@ -30,7 +54,7 @@ const NewsCard = ({ article, variant = 'default' }: NewsCardProps) => {
           <div className="flex items-center gap-2 mb-3">
             <span
               className="source-badge"
-              style={{ backgroundColor: `${article.sourceColor}15`, color: article.sourceColor }}
+              style={{ backgroundColor: `${safeColor}15`, color: safeColor }}
             >
               {article.source}
             </span>
@@ -62,11 +86,20 @@ const NewsCard = ({ article, variant = 'default' }: NewsCardProps) => {
 
   if (variant === 'compact') {
     return (
-      <article className="news-card group cursor-pointer flex gap-4 p-4">
+      <article 
+        className="news-card group cursor-pointer flex gap-4 p-4"
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-label={`Read article: ${article.title}`}
+      >
         <div className="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden">
           <img
             src={article.imageUrl}
             alt={article.title}
+            onError={handleImageError}
+            loading="lazy"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </div>
@@ -75,7 +108,7 @@ const NewsCard = ({ article, variant = 'default' }: NewsCardProps) => {
           <div className="flex items-center gap-2 mb-2">
             <span
               className="source-badge text-[10px]"
-              style={{ backgroundColor: `${article.sourceColor}15`, color: article.sourceColor }}
+              style={{ backgroundColor: `${safeColor}15`, color: safeColor }}
             >
               {article.source}
             </span>
@@ -91,11 +124,20 @@ const NewsCard = ({ article, variant = 'default' }: NewsCardProps) => {
   }
 
   return (
-    <article className="news-card group cursor-pointer">
+    <article 
+      className="news-card group cursor-pointer"
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={`Read article: ${article.title}`}
+    >
       <div className="relative h-48 overflow-hidden">
         <img
           src={article.imageUrl}
           alt={article.title}
+          onError={handleImageError}
+          loading="lazy"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
@@ -112,7 +154,7 @@ const NewsCard = ({ article, variant = 'default' }: NewsCardProps) => {
         <div className="flex items-center gap-2 mb-2">
           <span
             className="source-badge text-[10px]"
-            style={{ backgroundColor: `${article.sourceColor}15`, color: article.sourceColor }}
+            style={{ backgroundColor: `${safeColor}15`, color: safeColor }}
           >
             {article.source}
           </span>

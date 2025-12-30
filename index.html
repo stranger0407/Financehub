@@ -3,23 +3,49 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>Lovable App</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+    
+    <!-- 
+      Note: Security headers like X-Frame-Options, X-XSS-Protection should be set 
+      via HTTP headers on your production server (Nginx, Apache, Vercel, etc.)
+      CSP is relaxed for development - configure strict CSP on production server
+    -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    
+    <title>FinPulse - Financial News Aggregator | Markets, Economy, Stocks & Crypto</title>
+    <meta name="description" content="Stay updated with the latest financial news from Financial Express, LiveMint, Business Today, Economic Times and more. Real-time market data, stock analysis, and crypto updates." />
+    <meta name="author" content="FinPulse" />
+    <meta name="keywords" content="financial news, stock market, crypto, economy, markets, India, BSE, NSE, Sensex, Nifty" />
 
-    <!-- TODO: Update og:title to match your application name -->
-    <meta property="og:title" content="Lovable App" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <!-- Open Graph -->
+    <meta property="og:title" content="FinPulse - Financial News Aggregator" />
+    <meta property="og:description" content="Stay updated with the latest financial news from India's top publications. Real-time market data, stock analysis, and crypto updates." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:site_name" content="FinPulse" />
 
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:site" content="@FinPulse" />
+    <meta name="twitter:title" content="FinPulse - Financial News Aggregator" />
+    <meta name="twitter:description" content="Stay updated with the latest financial news. Real-time market data, stock analysis, and crypto updates." />
+    <meta name="twitter:image" content="/og-image.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Preconnect to external resources for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
   </head>
 
   <body>
+    <noscript>
+      <div style="padding: 2rem; text-align: center; font-family: system-ui, sans-serif;">
+        <h1>JavaScript Required</h1>
+        <p>Please enable JavaScript to use FinPulse.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

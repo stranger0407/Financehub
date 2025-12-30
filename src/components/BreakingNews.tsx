@@ -1,13 +1,35 @@
 import { Zap } from 'lucide-react';
 import { Article } from '@/data/newsData';
+import { validateHexColor, handleImageError } from '@/lib/security';
 
 interface BreakingNewsProps {
   article: Article;
+  onArticleClick: (article: Article) => void;
 }
 
-const BreakingNews = ({ article }: BreakingNewsProps) => {
+const BreakingNews = ({ article, onArticleClick }: BreakingNewsProps) => {
+  const safeColor = validateHexColor(article.sourceColor);
+
+  const handleClick = () => {
+    onArticleClick(article);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-destructive/30 bg-gradient-to-r from-destructive/10 via-card to-card">
+    <article 
+      className="relative overflow-hidden rounded-2xl border border-destructive/30 bg-gradient-to-r from-destructive/10 via-card to-card cursor-pointer group"
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={`Read breaking news: ${article.title}`}
+    >
       <div className="absolute inset-0 bg-gradient-to-r from-destructive/5 to-transparent" />
       <div className="relative flex flex-col lg:flex-row">
         {/* Image */}
@@ -15,7 +37,9 @@ const BreakingNews = ({ article }: BreakingNewsProps) => {
           <img
             src={article.imageUrl}
             alt={article.title}
-            className="w-full h-full object-cover"
+            onError={handleImageError}
+            loading="lazy"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent lg:bg-gradient-to-r" />
         </div>
@@ -29,13 +53,13 @@ const BreakingNews = ({ article }: BreakingNewsProps) => {
             </span>
             <span
               className="source-badge"
-              style={{ backgroundColor: `${article.sourceColor}20`, color: article.sourceColor }}
+              style={{ backgroundColor: `${safeColor}20`, color: safeColor }}
             >
               {article.source}
             </span>
           </div>
 
-          <h2 className="font-heading text-2xl lg:text-3xl font-bold mb-4 leading-tight">
+          <h2 className="font-heading text-2xl lg:text-3xl font-bold mb-4 leading-tight group-hover:text-primary transition-colors">
             {article.title}
           </h2>
 
@@ -52,7 +76,7 @@ const BreakingNews = ({ article }: BreakingNewsProps) => {
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 

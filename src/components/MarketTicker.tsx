@@ -2,6 +2,11 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 import { marketData } from '@/data/newsData';
 
 const MarketTicker = () => {
+  // Guard against empty or undefined market data
+  if (!marketData || marketData.length === 0) {
+    return null;
+  }
+
   // Duplicate for seamless loop
   const duplicatedData = [...marketData, ...marketData];
 

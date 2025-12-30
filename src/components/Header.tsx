@@ -1,7 +1,9 @@
 import { Search, TrendingUp, Bell, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useDebounce, useMediaQuery } from '@/hooks/use-debounce';
+import { sanitizeSearchInput } from '@/lib/security';
 
 interface HeaderProps {
   onSearch: (query: string) => void;
@@ -11,10 +13,40 @@ const Header = ({ onSearch }: HeaderProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Debounce search for better performance
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  
+  // Close mobile menu when viewport changes to desktop
+  const isDesktop = useMediaQuery(768);
 
-  const handleSearch = (e: React.FormEvent) => {
+  // Apply debounced search
+  useEffect(() => {
+    onSearch(debouncedSearchQuery);
+  }, [debouncedSearchQuery, onSearch]);
+
+  // Close mobile menu when switching to desktop view
+  useEffect(() => {
+    if (isDesktop && isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+  }, [isDesktop, isMobileMenuOpen]);
+
+  const handleSearchChange = useCallback((value: string) => {
+    const sanitized = sanitizeSearchInput(value);
+    setSearchQuery(sanitized);
+  }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(searchQuery);
+    // Immediate search on form submit
+    onSearch(sanitizeSearchInput(searchQuery));
+  };
+
+  const handleClearSearch = () => {
+    setIsSearchOpen(false);
+    setSearchQuery('');
+    onSearch('');
   };
 
   return (
@@ -63,24 +95,23 @@ const Header = ({ onSearch }: HeaderProps) => {
             {/* Search */}
             <div className="hidden sm:block">
               {isSearchOpen ? (
-                <form onSubmit={handleSearch} className="flex items-center gap-2 animate-slide-in-right">
+                <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 animate-slide-in-right">
                   <Input
                     type="text"
                     placeholder="Search news..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    maxLength={100}
                     className="w-64 bg-secondary/50 border-border/50 focus:border-primary"
                     autoFocus
+                    aria-label="Search news articles"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() => {
-                      setIsSearchOpen(false);
-                      setSearchQuery('');
-                      onSearch('');
-                    }}
+                    onClick={handleClearSearch}
+                    aria-label="Close search"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -91,15 +122,16 @@ const Header = ({ onSearch }: HeaderProps) => {
                   size="icon"
                   onClick={() => setIsSearchOpen(true)}
                   className="hover:bg-secondary"
+                  aria-label="Open search"
                 >
                   <Search className="h-4 w-4" />
                 </Button>
               )}
             </div>
 
-            <Button variant="ghost" size="icon" className="hover:bg-secondary relative">
+            <Button variant="ghost" size="icon" className="hover:bg-secondary relative" aria-label="Notifications">
               <Bell className="h-4 w-4" />
-              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
+              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" aria-hidden="true" />
             </Button>
 
             <Button variant="default" size="sm" className="hidden sm:flex bg-primary hover:bg-primary/90">
@@ -112,6 +144,8 @@ const Header = ({ onSearch }: HeaderProps) => {
               size="icon"
               className="md:hidden"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
@@ -120,7 +154,7 @@ const Header = ({ onSearch }: HeaderProps) => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-border/40 animate-fade-in">
+          <nav className="md:hidden py-4 border-t border-border/40 animate-fade-in" aria-label="Mobile navigation">
             <div className="flex flex-col gap-2">
               <a href="#" className="px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary rounded-lg">
                 Markets
@@ -142,11 +176,10 @@ const Header = ({ onSearch }: HeaderProps) => {
                   type="text"
                   placeholder="Search news..."
                   value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    onSearch(e.target.value);
-                  }}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  maxLength={100}
                   className="bg-secondary/50 border-border/50"
+                  aria-label="Search news articles"
                 />
               </div>
             </div>
